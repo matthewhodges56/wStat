@@ -1,9 +1,41 @@
-const API_KEY = '5456a54926974019979233955252602'
 const typingDelay = 750; // Delay in milliseconds (0.75s)
 let city, weatherData, typingTimer
+let faviconURL = "https://emojicdn.elk.sh/🌎";
+
+// Update Favicon
+let favicon = document.querySelector("link[rel='icon']") || document.createElement("link");
+favicon.rel = "icon";
+favicon.href = faviconURL;
+document.head.appendChild(favicon);
+
+async function getGeminiSummary(weatherData) {
+    try {
+        const response = await fetch("http://localhost:3000/getWeatherSummary", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ weatherData })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            console.error("AI Summary Error:", data.error);
+            document.getElementById("weatherSummary").innerText = "Couldn't generate summary.";
+            return;
+        }
+
+        document.getElementById("weatherSummary").innerText = data.summary;
+    } catch (error) {
+        console.error("Request Error:", error);
+        document.getElementById("weatherSummary").innerText = "Failed to fetch summary.";
+    }
+}
 
 function updateWeatherUI() {
     let conditionText = weatherData.current.condition.text;
+    let high = weatherData.forecast.forecastday[0].day.maxtemp_f
+    let low = weatherData.forecast.forecastday[0].day.mintemp_f
+    let rainChance = weatherData.forecast.forecastday[0].day.daily_chance_of_rain
     let temp = weatherData.current.temp_f; // Temperature in Fahrenheit
     let feelsLike = weatherData.current.feelslike_f; // Feels like temperature
     let conditionIcon = "";
@@ -15,13 +47,13 @@ function updateWeatherUI() {
     if (conditionText.includes("Sunny")) {
         conditionIcon = "☀️";
         faviconURL = "https://emojicdn.elk.sh/☀️"; 
-    } else if (conditionText.includes("Cloudy")) {
+    } else if (conditionText.includes("Cloudy") || conditionText.includes("Overcast")) {
         conditionIcon = "☁️";
         faviconURL = "https://emojicdn.elk.sh/☁️";
     } else if (conditionText.includes("Partly cloudy")) {
         conditionIcon = "⛅";
         faviconURL = "https://emojicdn.elk.sh/⛅";
-    } else if (conditionText.includes("Rain") || conditionText.includes("Drizzle")) {
+    } else if (conditionText.includes("Rain") || conditionText.includes("Drizzle") || conditionText.includes("Patchy rain nearby")) {
         conditionIcon = "🌧️";
         faviconURL = "https://emojicdn.elk.sh/🌧️";
     } else if (conditionText.includes("Thunderstorm")) {
@@ -71,6 +103,8 @@ function updateWeatherUI() {
     }
 
     // Update UI Elements
+    document.getElementById("highLow").innerHTML = `<strong>High/Low</strong>: 🌡️ ${high}°F / ${low}°F`;
+    document.getElementById("rainChance").innerHTML = `<strong>Rain Chance</strong>: 🌧️ ${rainChance}%`
     document.getElementById("condition").innerHTML = `<strong>Condition:</strong> ${conditionIcon} ${conditionText}`;
     document.getElementById("temp").innerHTML = `<strong>Temperature:</strong> ${tempIcon} ${temp}°F`;
     document.getElementById("feelsLike").innerHTML = `<strong>Feels Like:</strong> ${feelsLikeIcon} ${feelsLike}°F`;
@@ -84,29 +118,34 @@ function updateWeatherUI() {
     favicon.rel = "icon";
     favicon.href = faviconURL;
     document.head.appendChild(favicon);
+
+    getGeminiSummary(weatherData)
 }
 
 function showWeather() {
     $("#getWeather").fadeOut(function () {
         $("#showWeather").fadeIn();
     });
-    // Change Title
-    document.title = `${weatherData.location.name}, ${weatherData.location.region} Weather`;
     // Header
     document.getElementById("weatherFor").textContent  = `Weather for ${weatherData.location.name}, ${weatherData.location.region}`;
     updateWeatherUI()
 }
 
 function getWeather(city) {
-    fetch(`http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`)
+    fetch(`http://localhost:3000/api/weather?city=${city}`)
     .then(response => response.json())
     .then(data => {
-        weatherData = data; 
-        showWeather()
-        console.log(weatherData); 
+        if (data.error) {
+            console.error("Error fetching weather data:", data.error);
+            return;
+        }
+        weatherData = data;
+        showWeather();
+        console.log(weatherData);
     })
     .catch(error => console.error("Error fetching weather data: ", error));
 }
+
 
 document.getElementById("txtCity").addEventListener("input", function() {
     city = this.value
@@ -118,4 +157,29 @@ document.getElementById("txtCity").addEventListener("input", function() {
     typingTimer = setTimeout(() => {
         getWeather(city);
     }, typingDelay);
+})
+
+function resetWeatherUI() {
+    document.getElementById("highLow").innerHTML = "";
+    document.getElementById("rainChance").innerHTML = "";
+    document.getElementById("condition").innerHTML = "";
+    document.getElementById("temp").innerHTML = "";
+    document.getElementById("feelsLike").innerHTML = "";
+    document.getElementById("windSpeed").innerHTML  = "";
+    document.getElementById("weatherSummary").innerText = "";
+}
+
+$("#anotherWeather").on("click", function(){
+    $("#showWeather").fadeOut(function () {
+        document.getElementById("txtCity").value = "";
+        // Reset Tab Title and Favicon
+        document.title = "wStat";
+        let favicon = document.querySelector("link[rel='icon']") || document.createElement("link");
+        favicon.rel = "icon";
+        favicon.href = "https://emojicdn.elk.sh/🌎";
+        document.head.appendChild(favicon);
+        $("#getWeather").fadeIn(function(){
+            resetWeatherUI();
+        });
+    });
 })

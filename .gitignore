@@ -1,0 +1,34 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+.yarn-integrity
+
+# API Keys & Config
+.env
+config.js
+
+# Logs
+logs/
+*.log
+*.out
+*.pid
+*.seed
+*.pid.lock
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE & Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
