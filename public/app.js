@@ -132,7 +132,7 @@ function showWeather() {
 }
 
 function getWeather(city) {
-    fetch("/api/weather?city=" + city)
+    fetch("http://localhost:3000/api/weather?city=" + city)
     .then(response => response.json())
     .then(data => {
         if (data.error) {
