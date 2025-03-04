@@ -17,10 +17,10 @@
                 <input type="text" id="txtCity" placeholder="City, State" class="form-control">
             </div>
         </form>
-        <form class="card col-10 col-lg-8" style="display: none;" id="showWeather">
+        <form class="card col-10 col-lg-8 smaller-weather-card" style="display: none;" id="showWeather">
             <div class="card-body">
-                <h2 class="text-center" id="weatherFor"></h2>
-                <div class="d-flex justify-content-center gap-4">
+                <h2 class="text-center fs-5 fw-bold" id="weatherFor"></h2>
+                <!-- <div class="d-flex justify-content-center gap-4">
                     <p id="temp"></p>
                     <p id="condition"></p>
                 </div>
@@ -32,9 +32,21 @@
                     <p id="feelsLike"></p>
                     <p id="windSpeed"></p>
                 </div>
-                <div class="d-flex justify-content-center gap-4 border border-secondary-subtle rounded-2 p-1">
+                <div id="weatherSummaryContainer" class="d-flex justify-content-center gap-4 border border-secondary-subtle rounded-2 p-1">
                     <p id="weatherSummary" class="text-center"></p>
+                </div> -->
+                <div class="weather-info-container">
+                    <div><p id="temp" class="fs-6"></p></div>
+                    <div><p id="condition" class="fs-6"></p></div>
+                    <div><p id="highLow" class="fs-6"></p></div>
+                    <div><p id="rainChance" class="fs-6"></p></div>
+                    <div><p id="feelsLike" class="fs-6"></p></div>
+                    <div><p id="windSpeed" class="fs-6"></p></div>
                 </div>
+                
+                <div id="weatherSummaryContainer" class="d-flex justify-content-center gap-4 border border-secondary-subtle rounded-2 p-1">
+                    <p id="weatherSummary" class="text-center"></p>
+                </div> 
                 <button class="btn btn-primary col-12 mt-2" id="anotherWeather" type="button">Back</button>
             </div>
         </form>
