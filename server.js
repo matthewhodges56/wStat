@@ -1,12 +1,17 @@
-import "dotenv/config"
-import express from "express"
-import cors from "cors"
+import path from "path";
+import { fileURLToPath } from "url";
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-const PORT = 3000;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY
+const PORT = process.env.PORT || 3000;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -14,10 +19,13 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the "public" folder
+app.use(express.static("public"));
+
 // Weather API Endpoint
 app.get("/api/weather", async (req, res) => {
     const city = req.query.city;
-    
+
     if (!city) {
         return res.status(400).json({ error: "City is required" });
     }
@@ -25,7 +33,7 @@ app.get("/api/weather", async (req, res) => {
     try {
         const response = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${city}&aqi=no`);
         const data = await response.json();
-        
+
         if (data.error) {
             return res.status(400).json({ error: data.error.message });
         }
@@ -36,6 +44,7 @@ app.get("/api/weather", async (req, res) => {
     }
 });
 
+// AI Weather Summary Endpoint
 app.post("/getWeatherSummary", async (req, res) => {
     try {
         const weatherData = req.body.weatherData;
@@ -55,7 +64,7 @@ app.post("/getWeatherSummary", async (req, res) => {
         - Provide a fun and engaging weather summary.`;
 
         const result = await model.generateContent(prompt);
-        const summary = result.response.text(); // Get AI-generated text
+        const summary = result.response.text(); 
 
         res.json({ summary });
     } catch (error) {
@@ -64,5 +73,10 @@ app.post("/getWeatherSummary", async (req, res) => {
     }
 });
 
-app.use(express.static("public"));
+// Fallback: Serve index.html for all other routes
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Start Server
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
