@@ -10,7 +10,7 @@ document.head.appendChild(favicon);
 
 async function getGeminiSummary(weatherData) {
     try {
-        const response = await fetch("http://localhost:3000/getWeatherSummary", {
+        const response = await fetch("https://wstat.onrender.com/getWeatherSummary", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ weatherData })
@@ -132,7 +132,7 @@ function showWeather() {
 }
 
 function getWeather(city) {
-    fetch("http://localhost:3000/api/weather?city=" + city)
+    fetch("https://wstat.onrender.com/api/weather?city=" + city)
     .then(response => response.json())
     .then(data => {
         if (data.error) {
