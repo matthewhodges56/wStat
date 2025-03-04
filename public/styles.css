@@ -5,3 +5,44 @@
 #showWeather p {
     font-size: 20px;
 }
+
+/* Only affect #showWeather */
+@media (max-width: 576px) {
+    .smaller-weather-card {
+        width: 85% !important;
+        max-width: 320px;
+        padding: 12px !important;
+    }
+
+    #showWeather h2 {
+        font-size: 16px !important;
+    }
+
+    #showWeather p {
+        font-size: 13px !important;
+        margin-bottom: 5px;
+    }
+
+    /* Align weather details in two columns for small screens */
+    .weather-info-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        text-align: center;
+    }
+}
+
+/* On larger screens, display items in a single row */
+@media (min-width: 577px) {
+    .weather-info-container {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .weather-info-container div {
+        min-width: 150px; /* Keeps items from getting too squished */
+        text-align: center;
+    }
+}
