@@ -146,6 +146,11 @@ function getWeather(city) {
     .catch(error => console.error("Error fetching weather data: ", error));
 }
 
+document.getElementById("txtCity").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Disable Enter key
+    }
+});
 
 document.getElementById("txtCity").addEventListener("input", function() {
     city = this.value
